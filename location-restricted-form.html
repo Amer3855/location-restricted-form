@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akses Terhad kepada Borang Google</title>
+</head>
+<body>
+    <h2>Akses Borang Google</h2>
+    <p id="status">Mengesan lokasi anda...</p>
+    <a id="access-link" href="https://forms.gle/oTZPpLD7NZVP9YwF8" target="_blank" style="display: none;">Klik di sini untuk akses borang</a>
+    
+    <script>
+        // Tetapan koordinat untuk dua lokasi
+        const locations = [
+            { latitude: 1.5285074862164894, longitude: 103.71130193867096 },
+            { latitude: 1.4616346321733167, longitude: 103.75895979634211 }
+        ];
+        const tolerance = 0.01; // Toleransi 0.01 dalam latitud/longitud (kira-kira 1 km)
+
+        // Fungsi untuk menyemak jika lokasi pengguna berada dalam lingkungan toleransi
+        function isWithinRange(userLatitude, userLongitude, targetLatitude, targetLongitude, tolerance) {
+            return Math.abs(userLatitude - targetLatitude) <= tolerance && Math.abs(userLongitude - targetLongitude) <= tolerance;
+        }
+
+        // Mengambil lokasi pengguna
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const userLatitude = position.coords.latitude;
+            const userLongitude = position.coords.longitude;
+            let accessGranted = false;
+
+            // Periksa jika lokasi pengguna berada dalam lingkungan salah satu lokasi yang dibenarkan
+            for (const location of locations) {
+                if (isWithinRange(userLatitude, userLongitude, location.latitude, location.longitude, tolerance)) {
+                    accessGranted = true;
+                    break;
+                }
+            }
+
+            if (accessGranted) {
+                document.getElementById('access-link').style.display = 'block'; // Paparkan pautan borang
+                document.getElementById('status').textContent = "Anda berada dalam lingkungan lokasi yang dibenarkan.";
+            } else {
+                document.getElementById('status').textContent = "Maaf, anda hanya boleh mengakses borang ini dari lokasi tertentu.";
+            }
+        }, function(error) {
+            document.getElementById('status').textContent = "Gagal mengesan lokasi. Pastikan tetapan lokasi dibenarkan.";
+        });
+    </script>
+</body>
+</html>
